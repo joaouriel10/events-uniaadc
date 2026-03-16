@@ -14,3 +14,9 @@ pnpm-debug.log*
 
 # data
 /data
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# pnpm lockfile (developer will run pnpm install)
+pnpm-lock.yaml
