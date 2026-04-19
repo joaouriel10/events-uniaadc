@@ -1,0 +1,22 @@
+# compiled output
+/dist
+/node_modules
+
+# dotenv environment variables file
+.env
+
+# misc
+.DS_Store
+
+# debug
+npm-debug.log*
+pnpm-debug.log*
+
+# data
+/data
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# pnpm lockfile (developer will run pnpm install)
+pnpm-lock.yaml
