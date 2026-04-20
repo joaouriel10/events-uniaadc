@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { DatabaseModule } from '../database/database.module'
 import { MailModule } from '../mail/mail.module'
+import { PixModule } from '../pix/pix.module'
 
 import { CreateEventUseCase } from '@/domain/event/application/use-cases/create-event'
 import { FetchEventsUseCase } from '@/domain/event/application/use-cases/fetch-events'
@@ -16,6 +17,10 @@ import { DeleteBatchUseCase } from '@/domain/event/application/use-cases/delete-
 import { CreateWorkshopUseCase } from '@/domain/event/application/use-cases/create-workshop'
 import { FetchWorkshopsByEventUseCase } from '@/domain/event/application/use-cases/fetch-workshops-by-event'
 import { DeleteWorkshopUseCase } from '@/domain/event/application/use-cases/delete-workshop'
+import { CreateRegionalUseCase } from '@/domain/event/application/use-cases/create-regional'
+import { FetchRegionalsUseCase } from '@/domain/event/application/use-cases/fetch-regionals'
+import { CreateCongregationUseCase } from '@/domain/event/application/use-cases/create-congregation'
+import { FetchCongregationsByRegionalUseCase } from '@/domain/event/application/use-cases/fetch-congregations-by-regional'
 
 import { CreateEventController } from './controllers/create-event.controller'
 import { FetchEventsController } from './controllers/fetch-events.controller'
@@ -31,9 +36,13 @@ import { DeleteBatchController } from './controllers/delete-batch.controller'
 import { CreateWorkshopController } from './controllers/create-workshop.controller'
 import { FetchWorkshopsByEventController } from './controllers/fetch-workshops-by-event.controller'
 import { DeleteWorkshopController } from './controllers/delete-workshop.controller'
+import { CreateRegionalController } from './controllers/create-regional.controller'
+import { FetchRegionalsController } from './controllers/fetch-regionals.controller'
+import { CreateCongregationController } from './controllers/create-congregation.controller'
+import { FetchCongregationsByRegionalController } from './controllers/fetch-congregations-by-regional.controller'
 
 @Module({
-  imports: [DatabaseModule, MailModule],
+  imports: [DatabaseModule, MailModule, PixModule],
   controllers: [
     CreateEventController,
     FetchEventsController,
@@ -49,6 +58,10 @@ import { DeleteWorkshopController } from './controllers/delete-workshop.controll
     CreateWorkshopController,
     FetchWorkshopsByEventController,
     DeleteWorkshopController,
+    CreateRegionalController,
+    FetchRegionalsController,
+    CreateCongregationController,
+    FetchCongregationsByRegionalController,
   ],
   providers: [
     CreateEventUseCase,
@@ -65,6 +78,10 @@ import { DeleteWorkshopController } from './controllers/delete-workshop.controll
     CreateWorkshopUseCase,
     FetchWorkshopsByEventUseCase,
     DeleteWorkshopUseCase,
+    CreateRegionalUseCase,
+    FetchRegionalsUseCase,
+    CreateCongregationUseCase,
+    FetchCongregationsByRegionalUseCase,
   ],
 })
 export class HttpModule {}

@@ -5,7 +5,9 @@ import { DocumentAlreadyRegisteredError } from '@/domain/event/application/use-c
 import { EventNotActiveError } from '@/domain/event/application/use-cases/errors/event-not-active-error'
 import { BatchNotActiveError } from '@/domain/event/application/use-cases/errors/batch-not-active-error'
 import { WorkshopNotInEventError } from '@/domain/event/application/use-cases/errors/workshop-not-in-event-error'
+import { CongregationNotInRegionalError } from '@/domain/event/application/use-cases/errors/congregation-not-in-regional-error'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
+import { RegistrationPresenter } from '../presenters/registration-presenter'
 import {
   BadRequestException,
   Body,
@@ -23,10 +25,10 @@ const registerParticipantBodySchema = z.object({
   document: z.string(),
   phone: z.string(),
   email: z.string().email(),
-  regional: z.string(),
-  congregation: z.string(),
   bringsChildren: z.boolean().default(false),
   batchId: z.string().uuid(),
+  regionalId: z.string().uuid(),
+  congregationId: z.string().uuid(),
   workshopIds: z.array(z.string().uuid()).default([]),
 })
 
@@ -49,10 +51,10 @@ export class RegisterParticipantController {
       document,
       phone,
       email,
-      regional,
-      congregation,
       bringsChildren,
       batchId,
+      regionalId,
+      congregationId,
       workshopIds,
     } = body
 
@@ -61,11 +63,11 @@ export class RegisterParticipantController {
       document,
       phone,
       email,
-      regional,
-      congregation,
       bringsChildren,
       eventId,
       batchId,
+      regionalId,
+      congregationId,
       workshopIds,
     })
 
@@ -85,9 +87,15 @@ export class RegisterParticipantController {
           throw new BadRequestException(error.message)
         case WorkshopNotInEventError:
           throw new BadRequestException(error.message)
+        case CongregationNotInRegionalError:
+          throw new BadRequestException(error.message)
         default:
           throw new BadRequestException(error.message)
       }
+    }
+
+    return {
+      registration: RegistrationPresenter.toHTTP(result.value.registration),
     }
   }
 }

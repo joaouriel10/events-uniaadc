@@ -7,11 +7,13 @@ export interface RegistrationProps {
   document: string
   phone: string
   email: string
-  regional: string
-  congregation: string
   bringsChildren: boolean
+  pixPayload: string
+  pixQrCode: string
   eventId: UniqueEntityID
   batchId: UniqueEntityID
+  regionalId: UniqueEntityID
+  congregationId: UniqueEntityID
   workshopIds: UniqueEntityID[]
   createdAt: Date
 }
@@ -33,16 +35,16 @@ export class Registration extends Entity<RegistrationProps> {
     return this.props.email
   }
 
-  get regional() {
-    return this.props.regional
-  }
-
-  get congregation() {
-    return this.props.congregation
-  }
-
   get bringsChildren() {
     return this.props.bringsChildren
+  }
+
+  get pixPayload() {
+    return this.props.pixPayload
+  }
+
+  get pixQrCode() {
+    return this.props.pixQrCode
   }
 
   get eventId() {
@@ -51,6 +53,14 @@ export class Registration extends Entity<RegistrationProps> {
 
   get batchId() {
     return this.props.batchId
+  }
+
+  get regionalId() {
+    return this.props.regionalId
+  }
+
+  get congregationId() {
+    return this.props.congregationId
   }
 
   get workshopIds() {
@@ -64,7 +74,11 @@ export class Registration extends Entity<RegistrationProps> {
   static create(
     props: Optional<
       RegistrationProps,
-      'createdAt' | 'bringsChildren' | 'workshopIds'
+      | 'createdAt'
+      | 'bringsChildren'
+      | 'workshopIds'
+      | 'pixPayload'
+      | 'pixQrCode'
     >,
     id?: UniqueEntityID,
   ) {
@@ -73,6 +87,8 @@ export class Registration extends Entity<RegistrationProps> {
         ...props,
         bringsChildren: props.bringsChildren ?? false,
         workshopIds: props.workshopIds ?? [],
+        pixPayload: props.pixPayload ?? '',
+        pixQrCode: props.pixQrCode ?? '',
         createdAt: props.createdAt ?? new Date(),
       },
       id,
