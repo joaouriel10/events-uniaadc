@@ -24,8 +24,10 @@ export class FetchRegistrationsByEventUseCase {
     eventId,
     page,
   }: FetchRegistrationsByEventUseCaseRequest): Promise<FetchRegistrationsByEventUseCaseResponse> {
-    const registrations =
-      await this.registrationsRepository.findManyByEventId(eventId, { page })
+    const registrations = await this.registrationsRepository.findManyByEventId(
+      eventId,
+      { page },
+    )
 
     return right({ registrations })
   }

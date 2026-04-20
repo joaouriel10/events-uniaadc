@@ -1,6 +1,12 @@
 import { FetchRegistrationsByEventUseCase } from '@/domain/event/application/use-cases/fetch-registrations-by-event'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
-import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/common'
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  Query,
+} from '@nestjs/common'
 import { z } from 'zod'
 import { RegistrationPresenter } from '../presenters/registration-presenter'
 

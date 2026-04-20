@@ -5,13 +5,15 @@ export class RegistrationPresenter {
     return {
       id: registration.id.toString(),
       name: registration.name,
-      cpf: registration.cpf,
+      document: registration.document,
       phone: registration.phone,
       email: registration.email,
-      extraLunch: registration.extraLunch,
+      regional: registration.regional,
+      congregation: registration.congregation,
+      bringsChildren: registration.bringsChildren,
       eventId: registration.eventId.toString(),
-      regionalId: registration.regionalId.toString(),
-      congregationId: registration.congregationId.toString(),
+      batchId: registration.batchId.toString(),
+      workshopIds: registration.workshopIds.map((id) => id.toString()),
       createdAt: registration.createdAt,
     }
   }

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { DatabaseModule } from '../database/database.module'
+import { MailModule } from '../mail/mail.module'
 
 import { CreateEventUseCase } from '@/domain/event/application/use-cases/create-event'
 import { FetchEventsUseCase } from '@/domain/event/application/use-cases/fetch-events'
@@ -9,11 +10,12 @@ import { DeleteEventUseCase } from '@/domain/event/application/use-cases/delete-
 import { RegisterParticipantUseCase } from '@/domain/event/application/use-cases/register-participant'
 import { FetchRegistrationsByEventUseCase } from '@/domain/event/application/use-cases/fetch-registrations-by-event'
 import { CancelRegistrationUseCase } from '@/domain/event/application/use-cases/cancel-registration'
-import { CreateRegionalUseCase } from '@/domain/event/application/use-cases/create-regional'
-import { FetchRegionalsUseCase } from '@/domain/event/application/use-cases/fetch-regionals'
-import { CreateCongregationUseCase } from '@/domain/event/application/use-cases/create-congregation'
-import { FetchCongregationsUseCase } from '@/domain/event/application/use-cases/fetch-congregations'
-import { FetchCongregationsByRegionalUseCase } from '@/domain/event/application/use-cases/fetch-congregations-by-regional'
+import { CreateBatchUseCase } from '@/domain/event/application/use-cases/create-batch'
+import { FetchBatchesByEventUseCase } from '@/domain/event/application/use-cases/fetch-batches-by-event'
+import { DeleteBatchUseCase } from '@/domain/event/application/use-cases/delete-batch'
+import { CreateWorkshopUseCase } from '@/domain/event/application/use-cases/create-workshop'
+import { FetchWorkshopsByEventUseCase } from '@/domain/event/application/use-cases/fetch-workshops-by-event'
+import { DeleteWorkshopUseCase } from '@/domain/event/application/use-cases/delete-workshop'
 
 import { CreateEventController } from './controllers/create-event.controller'
 import { FetchEventsController } from './controllers/fetch-events.controller'
@@ -23,14 +25,15 @@ import { DeleteEventController } from './controllers/delete-event.controller'
 import { RegisterParticipantController } from './controllers/register-participant.controller'
 import { FetchRegistrationsByEventController } from './controllers/fetch-registrations-by-event.controller'
 import { CancelRegistrationController } from './controllers/cancel-registration.controller'
-import { CreateRegionalController } from './controllers/create-regional.controller'
-import { FetchRegionalsController } from './controllers/fetch-regionals.controller'
-import { CreateCongregationController } from './controllers/create-congregation.controller'
-import { FetchCongregationsController } from './controllers/fetch-congregations.controller'
-import { FetchCongregationsByRegionalController } from './controllers/fetch-congregations-by-regional.controller'
+import { CreateBatchController } from './controllers/create-batch.controller'
+import { FetchBatchesByEventController } from './controllers/fetch-batches-by-event.controller'
+import { DeleteBatchController } from './controllers/delete-batch.controller'
+import { CreateWorkshopController } from './controllers/create-workshop.controller'
+import { FetchWorkshopsByEventController } from './controllers/fetch-workshops-by-event.controller'
+import { DeleteWorkshopController } from './controllers/delete-workshop.controller'
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, MailModule],
   controllers: [
     CreateEventController,
     FetchEventsController,
@@ -40,11 +43,12 @@ import { FetchCongregationsByRegionalController } from './controllers/fetch-cong
     RegisterParticipantController,
     FetchRegistrationsByEventController,
     CancelRegistrationController,
-    CreateRegionalController,
-    FetchRegionalsController,
-    CreateCongregationController,
-    FetchCongregationsController,
-    FetchCongregationsByRegionalController,
+    CreateBatchController,
+    FetchBatchesByEventController,
+    DeleteBatchController,
+    CreateWorkshopController,
+    FetchWorkshopsByEventController,
+    DeleteWorkshopController,
   ],
   providers: [
     CreateEventUseCase,
@@ -55,11 +59,12 @@ import { FetchCongregationsByRegionalController } from './controllers/fetch-cong
     RegisterParticipantUseCase,
     FetchRegistrationsByEventUseCase,
     CancelRegistrationUseCase,
-    CreateRegionalUseCase,
-    FetchRegionalsUseCase,
-    CreateCongregationUseCase,
-    FetchCongregationsUseCase,
-    FetchCongregationsByRegionalUseCase,
+    CreateBatchUseCase,
+    FetchBatchesByEventUseCase,
+    DeleteBatchUseCase,
+    CreateWorkshopUseCase,
+    FetchWorkshopsByEventUseCase,
+    DeleteWorkshopUseCase,
   ],
 })
 export class HttpModule {}

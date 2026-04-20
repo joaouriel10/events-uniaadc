@@ -103,7 +103,8 @@ export class RegisterParticipantUseCase {
     }
 
     if (workshopIds.length > 0) {
-      const workshops = await this.workshopsRepository.findManyByIds(workshopIds)
+      const workshops =
+        await this.workshopsRepository.findManyByIds(workshopIds)
 
       if (workshops.length !== workshopIds.length) {
         return left(new WorkshopNotInEventError())

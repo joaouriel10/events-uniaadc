@@ -13,6 +13,7 @@ export class PrismaRegistrationsRepository implements RegistrationsRepository {
   async findById(id: string): Promise<Registration | null> {
     const registration = await this.prisma.registration.findUnique({
       where: { id },
+      include: { workshops: true },
     })
 
     if (!registration) {
@@ -22,12 +23,13 @@ export class PrismaRegistrationsRepository implements RegistrationsRepository {
     return PrismaRegistrationMapper.toDomain(registration)
   }
 
-  async findByCpfAndEventId(
-    cpf: string,
+  async findByDocumentAndEventId(
+    document: string,
     eventId: string,
   ): Promise<Registration | null> {
     const registration = await this.prisma.registration.findFirst({
-      where: { cpf, eventId },
+      where: { document, eventId },
+      include: { workshops: true },
     })
 
     if (!registration) {
@@ -43,6 +45,7 @@ export class PrismaRegistrationsRepository implements RegistrationsRepository {
   ): Promise<Registration[]> {
     const registrations = await this.prisma.registration.findMany({
       where: { eventId },
+      include: { workshops: true },
       orderBy: { createdAt: 'desc' },
       take: 20,
       skip: (page - 1) * 20,
@@ -58,8 +61,17 @@ export class PrismaRegistrationsRepository implements RegistrationsRepository {
   }
 
   async create(registration: Registration): Promise<void> {
+    const data = PrismaRegistrationMapper.toPrisma(registration)
+
     await this.prisma.registration.create({
-      data: PrismaRegistrationMapper.toPrisma(registration),
+      data: {
+        ...data,
+        workshops: {
+          create: registration.workshopIds.map((workshopId) => ({
+            workshopId: workshopId.toString(),
+          })),
+        },
+      },
     })
   }
 

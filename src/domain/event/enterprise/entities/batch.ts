@@ -40,10 +40,7 @@ export class Batch extends Entity<BatchProps> {
     return now >= this.props.startDate && now <= this.props.endDate
   }
 
-  static create(
-    props: Optional<BatchProps, 'createdAt'>,
-    id?: UniqueEntityID,
-  ) {
+  static create(props: Optional<BatchProps, 'createdAt'>, id?: UniqueEntityID) {
     const batch = new Batch(
       {
         ...props,

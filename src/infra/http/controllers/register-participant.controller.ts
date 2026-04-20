@@ -1,9 +1,10 @@
 import { RegisterParticipantUseCase } from '@/domain/event/application/use-cases/register-participant'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 import { EventFullError } from '@/domain/event/application/use-cases/errors/event-full-error'
-import { CpfAlreadyRegisteredError } from '@/domain/event/application/use-cases/errors/cpf-already-registered-error'
-import { CongregationNotInRegionalError } from '@/domain/event/application/use-cases/errors/congregation-not-in-regional-error'
+import { DocumentAlreadyRegisteredError } from '@/domain/event/application/use-cases/errors/document-already-registered-error'
 import { EventNotActiveError } from '@/domain/event/application/use-cases/errors/event-not-active-error'
+import { BatchNotActiveError } from '@/domain/event/application/use-cases/errors/batch-not-active-error'
+import { WorkshopNotInEventError } from '@/domain/event/application/use-cases/errors/workshop-not-in-event-error'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import {
   BadRequestException,
@@ -19,12 +20,14 @@ import { z } from 'zod'
 
 const registerParticipantBodySchema = z.object({
   name: z.string(),
-  cpf: z.string(),
+  document: z.string(),
   phone: z.string(),
   email: z.string().email(),
-  extraLunch: z.boolean().default(false),
-  regionalId: z.string().uuid(),
-  congregationId: z.string().uuid(),
+  regional: z.string(),
+  congregation: z.string(),
+  bringsChildren: z.boolean().default(false),
+  batchId: z.string().uuid(),
+  workshopIds: z.array(z.string().uuid()).default([]),
 })
 
 const bodyValidationPipe = new ZodValidationPipe(registerParticipantBodySchema)
@@ -41,18 +44,29 @@ export class RegisterParticipantController {
     @Param('eventId') eventId: string,
     @Body(bodyValidationPipe) body: RegisterParticipantBody,
   ) {
-    const { name, cpf, phone, email, extraLunch, regionalId, congregationId } =
-      body
+    const {
+      name,
+      document,
+      phone,
+      email,
+      regional,
+      congregation,
+      bringsChildren,
+      batchId,
+      workshopIds,
+    } = body
 
     const result = await this.registerParticipant.execute({
       name,
-      cpf,
+      document,
       phone,
       email,
-      extraLunch,
+      regional,
+      congregation,
+      bringsChildren,
       eventId,
-      regionalId,
-      congregationId,
+      batchId,
+      workshopIds,
     })
 
     if (result.isLeft()) {
@@ -65,9 +79,11 @@ export class RegisterParticipantController {
           throw new BadRequestException(error.message)
         case EventFullError:
           throw new BadRequestException(error.message)
-        case CpfAlreadyRegisteredError:
+        case DocumentAlreadyRegisteredError:
           throw new ConflictException(error.message)
-        case CongregationNotInRegionalError:
+        case BatchNotActiveError:
+          throw new BadRequestException(error.message)
+        case WorkshopNotInEventError:
           throw new BadRequestException(error.message)
         default:
           throw new BadRequestException(error.message)

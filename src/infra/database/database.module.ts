@@ -1,13 +1,13 @@
 import { EventsRepository } from '@/domain/event/application/repositories/events-repository'
 import { RegistrationsRepository } from '@/domain/event/application/repositories/registrations-repository'
-import { RegionalsRepository } from '@/domain/event/application/repositories/regionals-repository'
-import { CongregationsRepository } from '@/domain/event/application/repositories/congregations-repository'
+import { BatchesRepository } from '@/domain/event/application/repositories/batches-repository'
+import { WorkshopsRepository } from '@/domain/event/application/repositories/workshops-repository'
 import { Module } from '@nestjs/common'
 import { PrismaService } from './prisma/prisma.service'
 import { PrismaEventsRepository } from './prisma/repositories/prisma-events-repository'
 import { PrismaRegistrationsRepository } from './prisma/repositories/prisma-registrations-repository'
-import { PrismaRegionalsRepository } from './prisma/repositories/prisma-regionals-repository'
-import { PrismaCongregationsRepository } from './prisma/repositories/prisma-congregations-repository'
+import { PrismaBatchesRepository } from './prisma/repositories/prisma-batches-repository'
+import { PrismaWorkshopsRepository } from './prisma/repositories/prisma-workshops-repository'
 
 @Module({
   providers: [
@@ -21,20 +21,20 @@ import { PrismaCongregationsRepository } from './prisma/repositories/prisma-cong
       useClass: PrismaRegistrationsRepository,
     },
     {
-      provide: RegionalsRepository,
-      useClass: PrismaRegionalsRepository,
+      provide: BatchesRepository,
+      useClass: PrismaBatchesRepository,
     },
     {
-      provide: CongregationsRepository,
-      useClass: PrismaCongregationsRepository,
+      provide: WorkshopsRepository,
+      useClass: PrismaWorkshopsRepository,
     },
   ],
   exports: [
     PrismaService,
     EventsRepository,
     RegistrationsRepository,
-    RegionalsRepository,
-    CongregationsRepository,
+    BatchesRepository,
+    WorkshopsRepository,
   ],
 })
 export class DatabaseModule {}
