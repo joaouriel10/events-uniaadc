@@ -1,10 +1,10 @@
 import { UseCaseError } from '@/core/errors/use-case-error'
 
-export class CongregationNotInRegionalError
+export class DocumentAlreadyRegisteredError
   extends Error
   implements UseCaseError
 {
   constructor() {
-    super('Congregation does not belong to the selected regional')
+    super('Document already registered for this event')
   }
 }

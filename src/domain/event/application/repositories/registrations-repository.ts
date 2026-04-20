@@ -3,8 +3,8 @@ import { Registration } from '@/domain/event/enterprise/entities/registration'
 
 export abstract class RegistrationsRepository {
   abstract findById(id: string): Promise<Registration | null>
-  abstract findByCpfAndEventId(
-    cpf: string,
+  abstract findByDocumentAndEventId(
+    document: string,
     eventId: string,
   ): Promise<Registration | null>
   abstract findManyByEventId(

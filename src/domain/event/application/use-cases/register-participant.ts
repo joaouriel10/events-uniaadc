@@ -6,29 +6,35 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Registration } from '@/domain/event/enterprise/entities/registration'
 import { EventsRepository } from '../repositories/events-repository'
 import { RegistrationsRepository } from '../repositories/registrations-repository'
-import { CongregationsRepository } from '../repositories/congregations-repository'
+import { BatchesRepository } from '../repositories/batches-repository'
+import { WorkshopsRepository } from '../repositories/workshops-repository'
+import { MailSender } from '../mail/mail-sender'
 import { EventFullError } from './errors/event-full-error'
-import { CpfAlreadyRegisteredError } from './errors/cpf-already-registered-error'
-import { CongregationNotInRegionalError } from './errors/congregation-not-in-regional-error'
+import { DocumentAlreadyRegisteredError } from './errors/document-already-registered-error'
 import { EventNotActiveError } from './errors/event-not-active-error'
+import { BatchNotActiveError } from './errors/batch-not-active-error'
+import { WorkshopNotInEventError } from './errors/workshop-not-in-event-error'
 
 interface RegisterParticipantUseCaseRequest {
   name: string
-  cpf: string
+  document: string
   phone: string
   email: string
-  extraLunch: boolean
+  regional: string
+  congregation: string
+  bringsChildren: boolean
   eventId: string
-  regionalId: string
-  congregationId: string
+  batchId: string
+  workshopIds: string[]
 }
 
 type RegisterParticipantUseCaseResponse = Either<
   | ResourceNotFoundError
   | EventNotActiveError
   | EventFullError
-  | CpfAlreadyRegisteredError
-  | CongregationNotInRegionalError,
+  | DocumentAlreadyRegisteredError
+  | BatchNotActiveError
+  | WorkshopNotInEventError,
   {
     registration: Registration
   }
@@ -39,18 +45,22 @@ export class RegisterParticipantUseCase {
   constructor(
     private eventsRepository: EventsRepository,
     private registrationsRepository: RegistrationsRepository,
-    private congregationsRepository: CongregationsRepository,
+    private batchesRepository: BatchesRepository,
+    private workshopsRepository: WorkshopsRepository,
+    private mailSender: MailSender,
   ) {}
 
   async execute({
     name,
-    cpf,
+    document,
     phone,
     email,
-    extraLunch,
+    regional,
+    congregation,
+    bringsChildren,
     eventId,
-    regionalId,
-    congregationId,
+    batchId,
+    workshopIds,
   }: RegisterParticipantUseCaseRequest): Promise<RegisterParticipantUseCaseResponse> {
     const event = await this.eventsRepository.findById(eventId)
 
@@ -69,35 +79,80 @@ export class RegisterParticipantUseCase {
     }
 
     const existing =
-      await this.registrationsRepository.findByCpfAndEventId(cpf, eventId)
+      await this.registrationsRepository.findByDocumentAndEventId(
+        document,
+        eventId,
+      )
 
     if (existing) {
-      return left(new CpfAlreadyRegisteredError())
+      return left(new DocumentAlreadyRegisteredError())
     }
 
-    const congregation =
-      await this.congregationsRepository.findById(congregationId)
+    const batch = await this.batchesRepository.findById(batchId)
 
-    if (!congregation) {
+    if (!batch) {
       return left(new ResourceNotFoundError())
     }
 
-    if (congregation.regionalId.toString() !== regionalId) {
-      return left(new CongregationNotInRegionalError())
+    if (batch.eventId.toString() !== eventId) {
+      return left(new ResourceNotFoundError())
+    }
+
+    if (!batch.isActive()) {
+      return left(new BatchNotActiveError())
+    }
+
+    if (workshopIds.length > 0) {
+      const workshops = await this.workshopsRepository.findManyByIds(workshopIds)
+
+      if (workshops.length !== workshopIds.length) {
+        return left(new WorkshopNotInEventError())
+      }
+
+      const allBelongToEvent = workshops.every(
+        (w) => w.eventId.toString() === eventId,
+      )
+
+      if (!allBelongToEvent) {
+        return left(new WorkshopNotInEventError())
+      }
     }
 
     const registration = Registration.create({
       name,
-      cpf,
+      document,
       phone,
       email,
-      extraLunch,
+      regional,
+      congregation,
+      bringsChildren,
       eventId: new UniqueEntityID(eventId),
-      regionalId: new UniqueEntityID(regionalId),
-      congregationId: new UniqueEntityID(congregationId),
+      batchId: new UniqueEntityID(batchId),
+      workshopIds: workshopIds.map((id) => new UniqueEntityID(id)),
     })
 
     await this.registrationsRepository.create(registration)
+
+    try {
+      await this.mailSender.send({
+        to: email,
+        subject: `Inscrição confirmada - ${event.name}`,
+        html: `
+          <h1>Inscrição confirmada!</h1>
+          <p>Olá <strong>${name}</strong>,</p>
+          <p>Sua inscrição no evento <strong>${event.name}</strong> foi realizada com sucesso.</p>
+          <ul>
+            <li><strong>Evento:</strong> ${event.name}</li>
+            <li><strong>Data:</strong> ${event.date.toLocaleDateString('pt-BR')}</li>
+            <li><strong>Local:</strong> ${event.location}</li>
+            <li><strong>Lote:</strong> ${batch.name} - R$ ${batch.price.toFixed(2)}</li>
+          </ul>
+          <p>Obrigado por se inscrever!</p>
+        `,
+      })
+    } catch {
+      // Email sending failure should not block the registration
+    }
 
     return right({ registration })
   }

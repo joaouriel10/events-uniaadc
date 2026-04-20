@@ -17,48 +17,66 @@ model Event {
   isActive        Boolean        @default(true) @map("is_active")
   createdAt       DateTime       @default(now()) @map("created_at")
   updatedAt       DateTime?      @updatedAt @map("updated_at")
+  batches         Batch[]
+  workshops       Workshop[]
   registrations   Registration[]
 
   @@map("events")
 }
 
+model Batch {
+  id            String         @id @default(uuid())
+  name          String
+  price         Float
+  startDate     DateTime       @map("start_date")
+  endDate       DateTime       @map("end_date")
+  eventId       String         @map("event_id")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registrations Registration[]
+
+  @@map("batches")
+}
+
+model Workshop {
+  id                    String                 @id @default(uuid())
+  name                  String
+  description           String                 @default("")
+  eventId               String                 @map("event_id")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  event                 Event                  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registrationWorkshops RegistrationWorkshop[]
+
+  @@map("workshops")
+}
+
 model Registration {
-  id             String   @id @default(uuid())
+  id             String                 @id @default(uuid())
   name           String
-  cpf            String
+  document       String
   phone          String
   email          String
-  extraLunch     Boolean  @default(false) @map("extra_lunch")
-  eventId        String   @map("event_id")
-  regionalId     String   @map("regional_id")
-  congregationId String   @map("congregation_id")
-  createdAt      DateTime @default(now()) @map("created_at")
+  regional       String
+  congregation   String
+  bringsChildren Boolean                @default(false) @map("brings_children")
+  eventId        String                 @map("event_id")
+  batchId        String                 @map("batch_id")
+  createdAt      DateTime               @default(now()) @map("created_at")
+  event          Event                  @relation(fields: [eventId], references: [id])
+  batch          Batch                  @relation(fields: [batchId], references: [id])
+  workshops      RegistrationWorkshop[]
 
-  event        Event        @relation(fields: [eventId], references: [id])
-  regional     Regional     @relation(fields: [regionalId], references: [id])
-  congregation Congregation @relation(fields: [congregationId], references: [id])
-
-  @@unique([cpf, eventId])
+  @@unique([document, eventId])
   @@map("registrations")
 }
 
-model Regional {
-  id            String         @id @default(uuid())
-  name          String
-  createdAt     DateTime       @default(now()) @map("created_at")
-  congregations Congregation[]
-  registrations Registration[]
+model RegistrationWorkshop {
+  id             String       @id @default(uuid())
+  registrationId String       @map("registration_id")
+  workshopId     String       @map("workshop_id")
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  workshop       Workshop     @relation(fields: [workshopId], references: [id], onDelete: Cascade)
 
-  @@map("regionals")
-}
-
-model Congregation {
-  id            String         @id @default(uuid())
-  name          String
-  regionalId    String         @map("regional_id")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  regional      Regional       @relation(fields: [regionalId], references: [id])
-  registrations Registration[]
-
-  @@map("congregations")
+  @@unique([registrationId, workshopId])
+  @@map("registration_workshops")
 }

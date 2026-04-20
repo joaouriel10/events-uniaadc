@@ -4,13 +4,15 @@ import { Optional } from '@/core/types/optional'
 
 export interface RegistrationProps {
   name: string
-  cpf: string
+  document: string
   phone: string
   email: string
-  extraLunch: boolean
+  regional: string
+  congregation: string
+  bringsChildren: boolean
   eventId: UniqueEntityID
-  regionalId: UniqueEntityID
-  congregationId: UniqueEntityID
+  batchId: UniqueEntityID
+  workshopIds: UniqueEntityID[]
   createdAt: Date
 }
 
@@ -19,8 +21,8 @@ export class Registration extends Entity<RegistrationProps> {
     return this.props.name
   }
 
-  get cpf() {
-    return this.props.cpf
+  get document() {
+    return this.props.document
   }
 
   get phone() {
@@ -31,20 +33,28 @@ export class Registration extends Entity<RegistrationProps> {
     return this.props.email
   }
 
-  get extraLunch() {
-    return this.props.extraLunch
+  get regional() {
+    return this.props.regional
+  }
+
+  get congregation() {
+    return this.props.congregation
+  }
+
+  get bringsChildren() {
+    return this.props.bringsChildren
   }
 
   get eventId() {
     return this.props.eventId
   }
 
-  get regionalId() {
-    return this.props.regionalId
+  get batchId() {
+    return this.props.batchId
   }
 
-  get congregationId() {
-    return this.props.congregationId
+  get workshopIds() {
+    return this.props.workshopIds
   }
 
   get createdAt() {
@@ -52,13 +62,17 @@ export class Registration extends Entity<RegistrationProps> {
   }
 
   static create(
-    props: Optional<RegistrationProps, 'createdAt' | 'extraLunch'>,
+    props: Optional<
+      RegistrationProps,
+      'createdAt' | 'bringsChildren' | 'workshopIds'
+    >,
     id?: UniqueEntityID,
   ) {
     const registration = new Registration(
       {
         ...props,
-        extraLunch: props.extraLunch ?? false,
+        bringsChildren: props.bringsChildren ?? false,
+        workshopIds: props.workshopIds ?? [],
         createdAt: props.createdAt ?? new Date(),
       },
       id,
