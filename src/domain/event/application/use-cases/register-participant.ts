@@ -138,7 +138,10 @@ export class RegisterParticipantUseCase {
       }
     }
 
-    const transactionId = new UniqueEntityID().toString().slice(0, 25)
+    const MAX_TRANSACTION_ID_LENGTH = 25
+    const transactionId = new UniqueEntityID()
+      .toString()
+      .slice(0, MAX_TRANSACTION_ID_LENGTH)
 
     const pix = await this.pixGenerator.generate({
       value: batch.price,
@@ -186,7 +189,7 @@ export class RegisterParticipantUseCase {
       })
     } catch (error) {
       this.logger.error(
-        `Failed to send registration confirmation email to ${email}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to send registration confirmation email for registration ${registration.id.toString()}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
     }
 
