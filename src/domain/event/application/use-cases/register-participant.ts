@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
@@ -42,6 +42,8 @@ type RegisterParticipantUseCaseResponse = Either<
 
 @Injectable()
 export class RegisterParticipantUseCase {
+  private readonly logger = new Logger(RegisterParticipantUseCase.name)
+
   constructor(
     private eventsRepository: EventsRepository,
     private registrationsRepository: RegistrationsRepository,
@@ -151,8 +153,10 @@ export class RegisterParticipantUseCase {
           <p>Obrigado por se inscrever!</p>
         `,
       })
-    } catch {
-      // Email sending failure should not block the registration
+    } catch (error) {
+      this.logger.error(
+        `Failed to send registration confirmation email to ${email}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
 
     return right({ registration })

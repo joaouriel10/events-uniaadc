@@ -21,14 +21,16 @@ export class FallbackMailSender implements MailSender {
       await this.sendGridMailSender.send(request)
     } catch (sendGridError) {
       this.logger.warn(
-        `SendGrid failed, falling back to Resend: ${sendGridError instanceof Error ? sendGridError.message : 'Unknown error'}`,
+        'SendGrid failed, falling back to Resend',
+        sendGridError instanceof Error ? sendGridError.stack : sendGridError,
       )
 
       try {
         await this.resendMailSender.send(request)
       } catch (resendError) {
         this.logger.error(
-          `Resend also failed: ${resendError instanceof Error ? resendError.message : 'Unknown error'}`,
+          'Resend also failed',
+          resendError instanceof Error ? resendError.stack : resendError,
         )
 
         throw resendError
